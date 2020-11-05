@@ -60,7 +60,7 @@ async def handle(request):
     await asyncio.sleep(random.randint(0, 1))
 
     try:
-        token =  app = request.rel_url.query['token']
+        token = request.rel_url.query['token']
         if token_verify(token) == "True":
             user_id = request.rel_url.query['user_id']
             app_id = request.rel_url.query['app_id']

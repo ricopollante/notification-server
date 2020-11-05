@@ -1,9 +1,11 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
+from auth.token_auth import token_encode, token_verify
+import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:iam100%pureROOT@localhost:3306/cnmdb'
@@ -100,13 +102,19 @@ app_schema = AppSchema()
 apps_all_schema = AppSchema(many=True)
 
 # ### VIEWS
-@app.route('/notifications')
+@app.route('/notifications', methods=['POST'])
 def dump_notifs():
-    
-    query_notif =  Notifications.query.all()
-    dump_notif = notifs_all_schema.dump(query_notif)
+        token = request.form['token']
+        if token_verify(token) == "True":
+            print("TRUE", file=sys.stdout)
+            query_notif =  Notifications.query.all()
+            dump_notif = notifs_all_schema.dump(query_notif)
 
-    return jsonify(dump_notif)
+        else:
+            #print(error, file=sys.stdout)
+            return("INVALID TOKEN")
+
+        return jsonify(dump_notif)
 
 # if __name__ == "__main__":
 #     app.run(port=5005)
